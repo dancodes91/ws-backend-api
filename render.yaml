@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: pricefile-api
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: pricefile-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CORS_ORIGINS
+        sync: false
+      - key: WALLACE_API_KEY
+        generateValue: true
+
+databases:
+  - name: pricefile-db
+    databaseName: pricefile_db
+    user: pricefile
