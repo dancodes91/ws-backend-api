@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import get_settings
-from app.database import Base
+from app.database import Base, engine, SessionLocal
 from app.routers import auth, dealers, vendors, files, links, wallace, notifications, reports
 
 settings = get_settings()
@@ -37,7 +37,31 @@ def health():
     return {"status": "ok"}
 
 
+def _ensure_tables_and_seed():
+    """Create tables if missing and seed initial admin. Safe to run on every startup."""
+    from app import models  # noqa: F401 - register all models with Base.metadata
+    from app.models import Admin
+    from app.services.auth_service import hash_password
+
+    Base.metadata.create_all(bind=engine)
+    db = SessionLocal()
+    try:
+        if db.query(Admin).first():
+            return
+        admin = Admin(
+            name="Admin",
+            email="admin@wallacedms.com",
+            password_hash=hash_password("admin123"),
+            role="admin",
+        )
+        db.add(admin)
+        db.commit()
+    finally:
+        db.close()
+
+
 @app.on_event("startup")
 def startup():
     from app.utils.storage import ensure_storage_path
     ensure_storage_path()
+    _ensure_tables_and_seed()
