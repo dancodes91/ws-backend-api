@@ -17,6 +17,11 @@ class LinkResponse(BaseModel):
     created_at: datetime
     downloaded_at: datetime | None
     download_url: str | None = None
+    # Extra context to help admins distinguish links
+    filename: str | None = None
+    version: str | None = None
+    vendor_code: str | None = None
+    vendor_name: str | None = None
 
     class Config:
         from_attributes = True

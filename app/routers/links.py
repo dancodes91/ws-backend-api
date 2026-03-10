@@ -32,6 +32,8 @@ def generate_download_links(
     links = generate_links(db, data.dealer_id, data.file_ids, base)
     result = []
     for link in links:
+        pf = link.price_file
+        vendor = pf.vendor if pf is not None else None
         url = f"{base}/api/links/download/{link.token}"
         result.append(
             LinkResponse(
@@ -43,6 +45,10 @@ def generate_download_links(
                 created_at=link.created_at,
                 downloaded_at=link.downloaded_at,
                 download_url=url,
+                filename=pf.filename if pf is not None else None,
+                version=pf.version if pf is not None else None,
+                vendor_code=vendor.code if vendor is not None else None,
+                vendor_name=vendor.name if vendor is not None else None,
             )
         )
     return result
@@ -90,6 +96,10 @@ def list_links(
             created_at=l.created_at,
             downloaded_at=l.downloaded_at,
             download_url=f"{base}/api/links/download/{l.token}",
+            filename=l.price_file.filename if l.price_file is not None else None,
+            version=l.price_file.version if l.price_file is not None else None,
+            vendor_code=l.price_file.vendor.code if getattr(l.price_file, "vendor", None) is not None else None,
+            vendor_name=l.price_file.vendor.name if getattr(l.price_file, "vendor", None) is not None else None,
         )
         for l in links
     ]
