@@ -35,6 +35,11 @@ class Settings(BaseSettings):
     # Wallace API (for utility authentication)
     wallace_api_key: str = "change-me-wallace-api-key"
 
+    # Google OAuth
+    google_client_id: str = ""
+    google_client_secret: str = ""
+    google_allowed_domains: str = ""  # optional, comma-separated
+
     @property
     def cors_origins_list(self) -> list[str]:
         return [o.strip() for o in self.cors_origins.split(",")]

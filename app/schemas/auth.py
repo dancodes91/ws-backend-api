@@ -1,5 +1,5 @@
 """Auth schemas."""
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 
 
 class LoginRequest(BaseModel):
@@ -32,3 +32,15 @@ class PasswordResetConfirm(BaseModel):
 
 class RefreshRequest(BaseModel):
     refresh_token: str
+
+
+class DealerRegisterRequest(BaseModel):
+    name: str = Field(..., min_length=1, max_length=255)
+    email: EmailStr
+    customer_number: str = Field(..., min_length=1, max_length=50)
+    password: str = Field(..., min_length=6, max_length=255)
+    notes: str | None = Field(default=None, max_length=1000)
+
+
+class DealerRegisterResponse(BaseModel):
+    message: str
